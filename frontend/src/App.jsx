@@ -14,6 +14,7 @@ import CrisprGame from './pages/CrisprGame'
 import OutcomeSimulator from './pages/OutcomeSimulator'
 import ExportCenter from './pages/ExportCenter'
 import BaseEditor from './pages/BaseEditor'
+import ScreenAnalyzer from './pages/ScreenAnalyzer'
 import LoadingScreen from './components/LoadingScreen'
 import AmbientBackground from './components/AmbientBackground'
 
@@ -30,6 +31,7 @@ const NAV_LINKS = [
   { to: '/outcome',    label: 'Outcome'      },
   { to: '/export',     label: 'Export'       },
   { to: '/base-edit',  label: 'Base Edit'    },
+  { to: '/screen',     label: 'Screen'       },
   { to: '/game',       label: 'Game'         },
   { to: '/medprep',    label: 'Med-Prep'     },
   { to: '/models',     label: 'Models'       },
@@ -206,6 +208,7 @@ export default function App() {
                   <Route path="/outcome"   element={<OutcomeSimulator />} />
                   <Route path="/export"    element={<ExportCenter />} />
                   <Route path="/base-edit" element={<BaseEditor />} />
+                  <Route path="/screen"    element={<ScreenAnalyzer />} />
                   <Route path="/medprep"   element={<Placeholder name="Med-Prep" />} />
                   <Route path="/models"    element={<Placeholder name="Models" />} />
                   <Route path="/sessions"  element={<Placeholder name="Sessions" />} />

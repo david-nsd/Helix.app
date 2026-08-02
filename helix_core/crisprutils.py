@@ -1,4 +1,6 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
+
+from helix_core.constants import MIN_SEQUENCE_LENGTH, MAX_SEQUENCE_LENGTH
 
 
 # ========= Translation & ORF utilities =========
@@ -149,7 +151,34 @@ WILDCARD_BASES = {
 # ---- Utilities ----
 
 def sanitize_sequence(seq: str) -> str:
+    """Strip all non-ACGT characters and uppercase the result."""
     return "".join(ch for ch in (seq or "").upper() if ch in "ACGT")
+
+
+def validate_sequence(
+    seq: str,
+    min_len: int = MIN_SEQUENCE_LENGTH,
+    max_len: int = MAX_SEQUENCE_LENGTH,
+) -> tuple[str, Optional[str]]:
+    """Validate and sanitize a DNA sequence.
+
+    Args:
+        seq: Raw input sequence string (may contain whitespace/newlines).
+        min_len: Minimum acceptable length in bp.
+        max_len: Maximum acceptable length in bp.
+
+    Returns:
+        Tuple of (sanitized_sequence, error_message).
+        error_message is None when the sequence is valid.
+    """
+    if not seq or not seq.strip():
+        return "", "Sequence cannot be empty"
+    cleaned = sanitize_sequence(seq)
+    if len(cleaned) < min_len:
+        return cleaned, f"Sequence too short: {len(cleaned)} bp (minimum {min_len} bp)"
+    if len(cleaned) > max_len:
+        return cleaned, f"Sequence too long: {len(cleaned)} bp (maximum {max_len} bp)"
+    return cleaned, None
 
 def reverse_complement(seq: str) -> str:
     comp = str.maketrans("ACGT", "TGCA")

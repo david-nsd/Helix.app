@@ -23,11 +23,13 @@ function useHover() {
 }
 
 function RiskBadge({ risk }) {
-  const s = risk === 'high'
-    ? { background: 'rgba(255,34,68,0.1)',   color: T.red,   border: '1px solid rgba(255,34,68,0.3)'   }
+  const s = risk === 'on-target'
+    ? { background: 'rgba(0,255,136,0.15)', color: T.green, border: '1px solid rgba(0,255,136,0.6)' }
+    : risk === 'high'
+    ? { background: 'rgba(255,34,68,0.1)',  color: T.red,   border: '1px solid rgba(255,34,68,0.3)'  }
     : risk === 'medium'
-    ? { background: 'rgba(255,170,0,0.1)',   color: T.amber, border: '1px solid rgba(255,170,0,0.3)'   }
-    : { background: 'rgba(0,255,136,0.1)',   color: T.green, border: '1px solid rgba(0,255,136,0.3)'   }
+    ? { background: 'rgba(255,170,0,0.1)',  color: T.amber, border: '1px solid rgba(255,170,0,0.3)'  }
+    : { background: 'rgba(74,138,90,0.1)',  color: T.dim,   border: '1px solid rgba(74,138,90,0.3)'  }
   return (
     <span style={{ ...s, padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', fontFamily: 'monospace' }}>
       {risk}
@@ -185,7 +187,7 @@ export default function OffTarget() {
     const i = grnas.findIndex(g => g.pos === selectedGuide.pos)
     return i >= 0 ? i : 0
   })
-  const [maxMismatches, setMaxMismatches] = useState(3)
+  const [maxMismatches, setMaxMismatches] = useState(4)
   const [result, setResult]               = useState(null)
   const [loading, setLoading]             = useState(false)
   const [error, setError]                 = useState(null)
@@ -201,6 +203,11 @@ export default function OffTarget() {
     setResult(null)
     setExpandedRow(null)
     try {
+      console.log('Off-target params:', {
+        guide: selectedGrna?.guide,
+        sequenceLength: sequence?.length,
+        sequence: sequence?.substring(0, 50)
+      })
       const data = await findOffTargets(
         selectedGrna.guide.slice(0, 20),
         sequence,
@@ -293,8 +300,20 @@ export default function OffTarget() {
           </button>
         </div>
 
-        <div style={{ fontSize: 10, color: T.muted, fontFamily: 'monospace' }}>
-          Higher mismatch tolerance = slower search and more false positives
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: 10, color: T.muted, fontFamily: 'monospace' }}>
+            Higher mismatch tolerance = slower search and more false positives
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+            <div style={{ fontSize: 10, color: T.muted, fontFamily: 'monospace' }}>
+              Searching <span style={{ color: T.green }}>{(sequence?.length || 0).toLocaleString()}bp</span>
+            </div>
+            {(sequence?.length || 0) < 1000 && (
+              <div style={{ fontSize: 10, color: T.amber, fontFamily: 'monospace' }}>
+                Short sequence — load a full gene for better results
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -309,6 +328,7 @@ export default function OffTarget() {
 
       {result && (
         <div style={{ display: 'flex', gap: 12 }}>
+          <StatCard label="On-target"    value={result.on_target}    color={T.green} />
           <StatCard label="Total sites"  value={result.total_sites}  color={T.text}  />
           <StatCard label="High risk"    value={result.high_risk}    color={T.red}   />
           <StatCard label="Medium risk"  value={result.medium_risk}  color={T.amber} />
@@ -420,12 +440,44 @@ export default function OffTarget() {
         </div>
       )}
 
-      {result && result.sites.length === 0 && (
+      {result && result.total_sites === 0 && (
         <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '48px 0', color: T.muted, fontSize: 12, fontFamily: 'monospace',
+          background: 'rgba(0,255,136,0.05)',
+          border: '1px solid rgba(0,255,136,0.2)',
+          borderRadius: 8,
+          padding: 16,
         }}>
-          No off-target sites found within {maxMismatches} mismatches
+          <div style={{ color: T.green, fontFamily: 'monospace', fontWeight: 500, fontSize: 13, marginBottom: 10 }}>
+            No off-targets detected in searched region
+          </div>
+          <div style={{ color: T.dim, fontFamily: 'monospace', fontSize: 11, lineHeight: 1.7, marginBottom: 12 }}>
+            0 off-target sites found within {maxMismatches} mismatches in the {(sequence?.length || 0).toLocaleString()}bp search region.
+            <br /><br />
+            Note: For comprehensive off-target analysis, search against the full genome.
+            This result covers only the provided sequence region ({(sequence?.length || 0).toLocaleString()}bp).
+          </div>
+          <div style={{
+            background: 'rgba(0,255,136,0.03)',
+            border: '1px solid rgba(0,255,136,0.1)',
+            borderRadius: 6,
+            padding: '10px 12px',
+            fontSize: 10,
+            color: T.muted,
+            fontFamily: 'monospace',
+            lineHeight: 1.7,
+          }}>
+            For whole-genome off-target analysis, use NCBI BLAST:{' '}
+            <a
+              href="https://blast.ncbi.nlm.nih.gov/Blast.cgi"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: T.green, textDecoration: 'underline' }}
+            >
+              blast.ncbi.nlm.nih.gov
+            </a>
+            <br />
+            Paste your guide sequence and search against Human genomic + transcript sequences (nt)
+          </div>
         </div>
       )}
 

@@ -47,7 +47,7 @@ EDIT_MAP: dict[str, tuple[str, str]] = {
 
 class AnalyzeRequest(BaseModel):
     sequence: str
-    target_position: int = 0  # unused, kept for backwards compatibility
+    target_position: int = 0  # accepted but ignored — full sequence is always scanned
     edit_type: str = "any"
     editor_type: str = "all"
 

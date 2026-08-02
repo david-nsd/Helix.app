@@ -59,6 +59,10 @@ function DistributionChart({ distribution, mostCommonSize }) {
   const filtered = SIZES.map(s => lookup[s] || null)
   const maxProb  = Math.max(...distribution.map(d => d.probability), 0.001)
 
+  const top3Sizes = new Set(
+    [...distribution].sort((a, b) => b.probability - a.probability).slice(0, 3).map(d => d.size)
+  )
+
   // chart geometry
   const VW    = 580
   const VH    = 200
@@ -149,17 +153,17 @@ function DistributionChart({ distribution, mostCommonSize }) {
                 strokeDasharray={item.frameshift ? '3,2' : 'none'}
                 rx="1"
               />
-              {isTop && bh > 8 && (
+              {top3Sizes.has(item.size) && bh > 8 && (
                 <text x={x + BARW / 2} y={by - 4}
                   textAnchor="middle" fontSize="7"
                   fill={col} fontFamily="monospace">
                   {(item.probability * 100).toFixed(1)}%
                 </text>
               )}
-              {item.frameshift && bh > 14 && (
-                <text x={x + BARW / 2} y={MT + CH + 12}
-                  textAnchor="middle" fontSize="7"
-                  fill={T.muted} fontFamily="monospace">FS</text>
+              {item.frameshift && (
+                <text x={x + BARW / 2} y={MT + CH + 11}
+                  textAnchor="middle" fontSize="8"
+                  fill="rgba(255,255,255,0.4)" fontFamily="monospace">FS</text>
               )}
             </g>
           )

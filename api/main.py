@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from api.routes import grnas, session, scoring, ai, orfs, variants, protein, pdb, offtarget, primers, genes, sequences, outcome, export, base_editor
+from api.routes import grnas, session, scoring, ai, orfs, variants, protein, pdb, offtarget, primers, genes, sequences, outcome, export, base_editor, screen
 
 app = FastAPI(title="Helix API", version="0.5.0")
 
@@ -33,6 +33,7 @@ app.include_router(sequences.router, prefix="/api")
 app.include_router(outcome.router,   prefix="/api")
 app.include_router(export.router,    prefix="/api")
 app.include_router(base_editor.router, prefix="/api/baseedit")
+app.include_router(screen.router,      prefix="/api")
 
 
 @app.get("/health")

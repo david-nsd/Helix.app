@@ -8,12 +8,12 @@ import pandas as pd
 import numpy as np
 
 # Your local helpers
-from crisprutils import (
+from helix_core.crisprutils import (
     PAM_SEQUENCES, PAM_SIDE, GUIDE_LENGTHS,
     sanitize_sequence, translate_dna, reverse_complement,
     find_sites_for_enzyme
 )
-from offtarget import KmerIndex, find_offtargets
+from helix_core.offtarget import KmerIndex, find_offtargets
 
 
 # ---------- Small utilities ----------

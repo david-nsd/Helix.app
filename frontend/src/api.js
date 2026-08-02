@@ -81,7 +81,6 @@ export const chatWithAI = (message, context = {}) => {
       top_score:  context.top_score  || 0.0,
     },
   }
-  console.log('chatWithAI request body:', JSON.stringify(body, null, 2))
   return api.post('/api/ai/chat', body).then(r => r.data)
 }
 

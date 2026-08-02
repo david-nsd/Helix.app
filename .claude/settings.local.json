@@ -8,7 +8,10 @@
       "PowerShell(Move-Item *)",
       "PowerShell(head *)",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\david\\\\PycharmProjects\\\\Helix.app\\\\frontend\" -Recurse | Where-Object { $_.Extension -in '.jsx', '.js', '.json', '.tsx', '.ts' -and $_.FullName -notmatch 'node_modules' } | Select-Object FullName)",
-      "Bash(awk '{print $NF}')"
+      "Bash(awk '{print $NF}')",
+      "Bash(grep *)",
+      "Bash(python3 -m py_compile /c/Users/david/PycharmProjects/Helix.app/api/routes/screen.py)",
+      "Bash(python *)"
     ]
   }
 }

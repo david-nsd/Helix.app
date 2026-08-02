@@ -12,18 +12,47 @@ _DINUCLEOTIDES = [a + b for a in _BASES for b in _BASES]
 
 
 def _gc(seq: str) -> float:
+    """Compute GC fraction for a DNA sequence.
+
+    Args:
+        seq: DNA string (upper or lower case).
+
+    Returns:
+        GC fraction in [0, 1].
+    """
     return (seq.count('G') + seq.count('C')) / max(len(seq), 1)
 
 
 def _reverse_complement(seq: str) -> str:
+    """Return the reverse complement of a DNA sequence.
+
+    Args:
+        seq: DNA string of ACGT characters.
+
+    Returns:
+        Reverse complement string.
+    """
     return ''.join(_COMPLEMENT.get(b, 'N') for b in reversed(seq))
 
 
 def extract_features(guide: str) -> np.ndarray:
+    """Extract 103 numeric features from a 20nt guide sequence.
+
+    Features:
+        - 7 numerical: GC, seed GC, Tm, self-complementarity,
+          PAM-proximal GC, PAM-distal GC, stability.
+        - 16 dinucleotide frequencies.
+        - 80 position one-hot encodings (4 bases × 20 positions).
+
+    Args:
+        guide: 20nt DNA guide sequence (uppercase preferred).
+
+    Returns:
+        NumPy float32 array of shape (103,).
+    """
     guide = guide.upper()[:20]
     n = len(guide)
 
-    # 7 numerical features
     gc = _gc(guide)
     seed_gc = _gc(guide[3:16])
     gc_count = guide.count('G') + guide.count('C')
@@ -34,12 +63,10 @@ def extract_features(guide: str) -> np.ndarray:
     pam_distal_gc = _gc(guide[0:12])
     stability = gc_count / 20
 
-    # 16 dinucleotide features
     dinuc = np.array(
         [guide.count(dn) / 19 for dn in _DINUCLEOTIDES], dtype=np.float32
     )
 
-    # 80 position one-hot features
     one_hot = np.zeros(80, dtype=np.float32)
     for pos in range(min(n, 20)):
         if guide[pos] in _BASE_IDX:
@@ -66,6 +93,11 @@ class HelixScorer:
         self.load()
 
     def load(self) -> bool:
+        """Load the scorer model from disk.
+
+        Returns:
+            True if the model loaded successfully, False otherwise.
+        """
         if self._loaded:
             return True
         if not self._model_path.exists():
@@ -87,6 +119,11 @@ class HelixScorer:
             return False
 
     def get_model_info(self) -> dict:
+        """Return metadata about the loaded model.
+
+        Returns:
+            Dict with keys: version, r2, pearson, n_features, loaded.
+        """
         return {
             'version': self.version,
             'r2': self.r2,
@@ -96,6 +133,14 @@ class HelixScorer:
         }
 
     def score(self, guide: str) -> float:
+        """Score a single 20nt guide sequence.
+
+        Args:
+            guide: 20nt DNA guide sequence.
+
+        Returns:
+            Efficiency score clipped to [0.0, 1.0].
+        """
         if not self._loaded:
             return self._fallback_score(guide)
         try:
@@ -103,25 +148,43 @@ class HelixScorer:
             features = features.reshape(1, -1)
             pred = self._model.predict(features)[0]
             return float(np.clip(pred, 0.0, 1.0))
-        except:
+        except Exception:
             return self._fallback_score(guide)
 
     def _fallback_score(self, guide: str) -> float:
+        """Rule-based fallback scorer used when the ML model is unavailable.
+
+        Args:
+            guide: DNA guide sequence.
+
+        Returns:
+            Heuristic score clipped to [0.0, 1.0].
+        """
         gc = (guide.count('G') + guide.count('C')) / len(guide)
         seed = guide[12:] if len(guide) >= 20 else guide
         seed_gc = (seed.count('G') + seed.count('C')) / len(seed)
         score = 0.4 * gc + 0.4 * seed_gc + 0.2 * 0.5
-        if 'TTTT' in guide: score -= 0.2
-        if 'GGGG' in guide: score -= 0.15
+        if 'TTTT' in guide:
+            score -= 0.2
+        if 'GGGG' in guide:
+            score -= 0.15
         return float(np.clip(score, 0.0, 1.0))
 
     def score_many(self, guides: list[str]) -> list[float]:
+        """Score multiple guide sequences in a single batch.
+
+        Args:
+            guides: List of 20nt DNA guide sequences.
+
+        Returns:
+            List of efficiency scores clipped to [0.0, 1.0], one per guide.
+        """
         if not self._loaded or not guides:
             return [self.score(g) for g in guides]
         X = np.stack([extract_features(g) for g in guides])
         try:
             preds = self._model.predict(X)
-        except:
+        except Exception:
             return [self.score(g) for g in guides]
         return [float(np.clip(p, 0.0, 1.0)) for p in preds]
 
@@ -130,6 +193,14 @@ _scorer = HelixScorer()
 
 
 def score_guide_ml(guide: str) -> float:
+    """Module-level convenience wrapper for scoring a single guide.
+
+    Args:
+        guide: 20nt DNA guide sequence.
+
+    Returns:
+        Efficiency score from the global HelixScorer instance.
+    """
     if not _scorer._loaded:
         _scorer.load()
     return _scorer.score(guide)
