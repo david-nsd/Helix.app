@@ -1,6 +1,6 @@
 # Helix
 
-Status: in development. Built with AI-assisted development (Claude Code).
+Status: in development. Built with AI-assisted development.
 
 Helix is a Python bioinformatics project with a Streamlit desktop UI, a small FastAPI mobile API, and shared core genomics utilities. Gradient-boosting regressor (103 sequence features) trained to approximate Azimuth scores from the Doench 2016 dataset (Pearson r = 0.79 on a random held-out split). Not validated against wet-lab results.
 
