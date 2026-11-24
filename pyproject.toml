@@ -8,7 +8,7 @@ version = "0.3.0"
 description = "Helix Suite: CRISPR Sandbox + Med-Prep"
 # If you have a README.md, keep the next line; otherwise delete it.
 readme = "README.md"
-requires-python = ">=3.10"npm install -g @anthropic-ai/claude-code
+requires-python = ">=3.10"
 dependencies = [
   "biopython>=1.84",
   "fastapi>=0.115",
