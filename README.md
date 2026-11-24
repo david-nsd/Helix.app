@@ -1,6 +1,8 @@
 # Helix
 
-Helix is a Python bioinformatics project with a Streamlit desktop UI, a small FastAPI mobile API, and shared core genomics utilities. ML scoring model validated against Doench et al. 2016 experimental data (Nature Biotechnology).
+Status: in development. Built with AI-assisted development (Claude Code).
+
+Helix is a Python bioinformatics project with a Streamlit desktop UI, a small FastAPI mobile API, and shared core genomics utilities. Gradient-boosting regressor (103 sequence features) trained to approximate Azimuth scores from the Doench 2016 dataset (Pearson r = 0.79 on a random held-out split). Not validated against wet-lab results.
 
 ## Components
 
@@ -28,8 +30,7 @@ The project can also load these values from `.env`.
 - Windows shortcut in this repo: `Run Helix Desktop.bat`
 
 ### 🎯 ML Scoring Model
-- Gradient Boosting model trained on **real experimental data**
-- Training set: Doench et al. 2016 (Nature Biotechnology) — 4,248 guides with measured cutting efficiency from human cells
+- Gradient-boosting regressor (103 sequence features) trained to approximate Azimuth scores from the Doench 2016 dataset (Pearson r = 0.79 on a random held-out split). Not validated against wet-lab results.
 - Test set performance: R² = 0.61, Pearson r = 0.79
 - 82 sequence features: position-specific one-hot encoding, GC content, seed region GC, melting temperature, self-complementarity, dinucleotide frequencies
 - Comparable to published sequence-only CRISPR scoring models
@@ -40,7 +41,7 @@ The project can also load these values from `.env`.
 If you use Helix in your research, please cite:
 
 **Helix CRISPR Suite**
-David L. — https://github.com/trevorphillip/Helix.app
+David Stoica, https://github.com/david-nsd/Helix.app
 
 **gRNA scoring model training data:**
 Doench JG, Fusi N, Sullender M, et al. Optimized sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9. Nature Biotechnology 34, 184–191 (2016).
