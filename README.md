@@ -2,11 +2,11 @@
 
 Status: in development. Built with AI-assisted development.
 
-Helix is a Python bioinformatics project with a Streamlit desktop UI, a small FastAPI mobile API, and shared core genomics utilities. Gradient-boosting regressor (103 sequence features) trained to approximate Azimuth scores from the Doench 2016 dataset (Pearson r = 0.79 on a random held-out split). Not validated against wet-lab results.
+Helix is a Python bioinformatics project with a React and Three.js web frontend (legacy Streamlit prototype in app.py), a small FastAPI mobile API, and shared core genomics utilities. Gradient-boosting regressor (103 sequence features) trained to approximate Azimuth scores from the Doench 2016 dataset (Pearson r = 0.79 on a random held-out split). Not validated against wet-lab results.
 
 ## Components
 
-- `app.py`: main Streamlit application
+- `app.py`: legacy Streamlit prototype
 - `mobile_api.py`: FastAPI service for RNA tooling
 - `helix_core/`: shared logic for sequence analysis and visualization support
 - `helix_desktop/`: desktop UI helpers
@@ -32,8 +32,7 @@ The project can also load these values from `.env`.
 ### 🎯 ML Scoring Model
 - Gradient-boosting regressor (103 sequence features) trained to approximate Azimuth scores from the Doench 2016 dataset (Pearson r = 0.79 on a random held-out split). Not validated against wet-lab results.
 - Test set performance: R² = 0.61, Pearson r = 0.79
-- 82 sequence features: position-specific one-hot encoding, GC content, seed region GC, melting temperature, self-complementarity, dinucleotide frequencies
-- Comparable to published sequence-only CRISPR scoring models
+- 103 sequence features: position-specific one-hot encoding, GC content, seed region GC, melting temperature, self-complementarity, dinucleotide frequencies
 - Reference: Doench JG et al. "Optimized sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9." Nature Biotechnology 34, 184–191 (2016)
 
 ## Citation
